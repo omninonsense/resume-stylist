@@ -2,8 +2,10 @@ module Jsonresume
   module Stylist
     class Theme
       def intialize(theme_path)
-        @template = Liqud::Template.parse(File.read(theme_path))
+        @source = File.read(theme_path)
         parse_frontmatter!
+
+        @template = Liqud::Template.parse(@source)
       end
 
       def render(resume_data)
@@ -18,29 +20,29 @@ module Jsonresume
         return if @frontmatter["flags"].include? "disable_post_processing"
 
         @document = Oga.parse_html @resume
-        @document.css(%q{style[lang="text/scss"]}).each do |style|
 
+        @document.css(%q{style[type="text/scss"], style[type="text/sass"]}).each do |style|
+          syntax = style.get("type")[5, 4].to_sym # Going to be :scss or :sass
+          css = Sass::Engine.new(style.text, syntax: syntax, style: :compressed)
+
+          tnode = Oga::XML::Text.new
+          tnode.text = css.render
+
+          style.children = [ tnode ]
+          style.set("type", "text/css")
         end
+
+        @resume = @document.to_xml
       end
 
       private
       def parse_frontmatter!
-      if @template =~ /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
-        @template = $POSTMATCH
-        @frontmatter = YAML.load($1)
-      end
+        if @source =~ /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
+          @source = $POSTMATCH
+          @frontmatter = YAML.load($1)
+        end
 
-      nil
-    end
-
-      private
-      def compile_scss(source)
-
-      end
-
-      private
-      def compile_sass(source)
-
+        nil
       end
     end
   end
