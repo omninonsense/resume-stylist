@@ -1,11 +1,16 @@
-module Jsonresume
+module JSONResume
   module Stylist
     class Theme
-      def intialize(theme_path)
-        @source = File.read(theme_path)
+      # def intialize(theme_path)
+        # @source = File.read(theme_path)
+      def initialize(source)
+        @source = source
+        @frontmatter = {
+          "flags" => []
+        }
         parse_frontmatter!
 
-        @template = Liqud::Template.parse(@source)
+        @template = Liquid::Template.parse(@source)
       end
 
       def render(resume_data)
@@ -39,7 +44,7 @@ module Jsonresume
       def parse_frontmatter!
         if @source =~ /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
           @source = $POSTMATCH
-          @frontmatter = YAML.load($1)
+          @frontmatter.merge!(YAML.load($1) || {})
         end
 
         nil
