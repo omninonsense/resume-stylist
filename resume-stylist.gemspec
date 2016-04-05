@@ -1,23 +1,23 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'jsonresume/stylist/version'
+require 'resume-stylist/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "jsonresume-stylist"
-  spec.version       = JSONResume::Stylist::VERSION
+  spec.name          = "resume-stylist"
+  spec.version       = ResumeStylist::VERSION
   spec.authors       = ["Nino Miletich"]
   spec.email         = ["nino@miletich.me"]
 
   spec.required_ruby_version = ">= 2.0"
 
-  spec.summary       = %q{Small framework for making jsonresume themes in liquid and scss.}
-  spec.homepage      = "https://github.com/omninonsense/jsonresume-stylist"
+  spec.summary       = %q{Small framework for making resume themes in liquid and scss.}
+  spec.homepage      = "https://github.com/omninonsense/resume-stylist"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
-  spec.executables   = ["jsonresume-stylist"]
+  spec.executables   = ["resume-stylist"]
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.10"

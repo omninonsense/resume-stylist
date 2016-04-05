@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in jsonresume-stylist.gemspec
+# Specify your gem's dependencies in resume-stylist.gemspec
 gemspec
