@@ -4,4 +4,5 @@ require "liquid"
 require "sass"
 
 require "resume-stylist/version"
+require "resume-stylist/resume"
 require "resume-stylist/theme"

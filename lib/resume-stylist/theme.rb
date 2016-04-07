@@ -29,10 +29,7 @@ module ResumeStylist
         syntax = style.get("type")[5, 4].to_sym # Going to be :scss or :sass
         css = Sass::Engine.new(style.text, syntax: syntax, style: :compressed)
 
-        tnode = Oga::XML::Text.new
-        tnode.text = css.render
-
-        style.children = [ tnode ]
+        style.inner_text = css.render
         style.set("type", "text/css")
       end
 
@@ -50,4 +47,3 @@ module ResumeStylist
     end
   end
 end
-
