@@ -1,3 +1,107 @@
 #!/usr/bin/env ruby
 
 require "resume-stylist"
+require "optparse"
+
+options = {}
+
+build_parser = OptionParser.new do |opts|
+  opts.banner = "Usage: resume-stylist build [options]"
+
+  opts.separator ""
+  opts.separator "Build options:"
+  # No argument, shows at tail.  This will print an options summary.
+  # Try it and see!
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+
+  opts.on("-t", "--theme [FILE]", String, "Which theme file to use") {|v| options[:theme] = v }
+  opts.on("-i", "--input-file [FILE]", String, "Input file") {|v| options[:input] = v }
+  opts.on("-o", "--output-file [FILE]", String, "Output file") {|v| options[:output] = v }
+  opts.on("-I", "--input-type [EXT]", String, "Input file format") {|v| options[:input_type] = v }
+  opts.on("-O", "--output-type [EXT]", String, "Output fil formate") {|v| options[:output_type] = v }
+end
+
+default_parser = OptionParser.new do |opts|
+  opts.banner = "Usage: resume-stylist [build] [options]"
+
+  opts.separator ""
+  opts.separator "Options:"
+  # No argument, shows at tail.  This will print an options summary.
+  # Try it and see!
+  opts.on_tail("-h", "--help", "Show this message") do
+    build_parser.banner = ""
+    puts opts
+    puts build_parser
+    exit
+  end
+  # Another typical switch to print the version.
+  opts.on_tail("-v", "--version", "Show version") do
+    puts "resume-stylist #{ResumeStylist::VERSION}"
+    exit
+  end
+
+  opts.on("-t", "--new-theme [FILE]", String, "Creates a theme template") {|v| options[:new_theme] = v }
+  opts.on("-r", "--new-resume [FILE]", String, "Creates a resume template") {|v| options[:new_resume] = v }
+end
+
+case ARGV[0]
+when "build"
+  ARGV.shift
+  build_parser.parse!
+
+  input = if options[:input] then options[:input] else ARGV.shift end
+  output = if options[:output] then options[:output] else ARGV.shift end
+
+  if options[:input_type].nil?
+    if input =~ /\.([\w\d-]+)\z/
+      input_type = $1
+    else
+      raise ArgumentError, "Please specify a type using `--input-type`"
+    end
+  else
+    input_type = options[:input_type]
+  end
+
+  if options[:output_type].nil?
+    if output =~ /\.([\w\d-]+)\z/
+      output_type = $1
+    else
+      raise ArgumentError, "Please specify a type using `--output-type`"
+    end
+  else
+    output_type = options[:output_type]
+  end
+
+  if options[:theme]
+    theme_source = File.read(File.expand_path(options[:theme]))
+  else
+    theme_source = File.read("#{Gem.datadir("resume-stylist")}/templates/theme.html.liquid")
+  end
+
+  resume = ResumeStylist::Resume.new(File.read(File.expand_path(input)), input_type)
+  theme = ResumeStylist::Theme.new(theme_source)
+
+  html = theme.render(resume.data)
+
+  case output_type
+  when "html"
+    out = html
+  when "pdf"
+    out = PDFKit.new(html, :page_size => "Letter").to_pdf
+  else
+    raise ArgumentError, "Unknown output format `#{output_type}`. Currently the stylist only supports PDF and HTML"
+  end
+
+  if output == "-"
+    puts out
+    exit
+  else
+    File.open(File.expand_path(output), "w") {|f| f.write out }
+  end
+
+else
+  default_parser.parse!
+end
