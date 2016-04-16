@@ -28,5 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "oga", "~> 2.0"
   spec.add_dependency "sass", "~> 3.0"
   spec.add_dependency "liquid", "~> 3.0"
+  spec.add_dependency "pdfkit", "~> 0.8.0"
 
 end
