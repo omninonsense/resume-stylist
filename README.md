@@ -1,39 +1,75 @@
 # Resume Stylist
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/resume-stylist`. To experiment with that code, run `bin/console` for an interactive prompt.
+**Note**: Currently in very early development.
 
-TODO: Delete this and the text above, and describe your gem
+Small framework for making CV/resume themes using [liquid](https://github.com/Shopify/liquid/wiki/liquid-for-designers) and [scss](http://sass-lang.com/).
 
 ## Installation
 
-Add this line to your application's Gemfile:
+~~~sh
+$ gem install resume-stylist
+~~~
 
-```ruby
-gem 'resume-stylist'
-```
+Also, since this uses PDFKit, you'll need to make sure you have `wkhtmltopdf` installed. On Arch it's as simple as running `sudo pacman -S wkhtmltopdf`, but consult their documentation for recommendations regarding other platforms: https://github.com/pdfkit/pdfkit#wkhtmltopdf
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install resume-stylist
 
 ## Usage
 
-TODO: Write usage instructions here
+### Tool usage
 
-## Development
+Create a new theme and a JSON resume template:
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. Run `bundle exec resume-stylist` to use the gem in this directory, ignoring other installed copies of this gem.
+~~~sh
+$ resume-stylist --new-theme fancy.html.liquid --new-resume john_doe.json
+~~~
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Build your theme as a PDF:
+
+~~~sh
+$ resume-stylist build john_doe.json john_doe.pdf
+~~~
+
+~~~sh
+$ resume-stylist build john_doe -I json john_doe.pdf
+~~~
+
+Run `resume-stylist --help` for more options!
+
+### Library usage
+
+#### Registering a custom resume format
+
+~~~rb
+module MyResumeFormat
+  def self.handles?(resume_format)
+    # Handle
+    resume_format.to_s =~ /(myformat|myf)/i
+  end
+
+  def load!(input)
+    # input is the resume data
+    data = My::Parser.parse(input)
+    @data = data.to_h
+  end
+end
+
+ResumeStylist::Resume.register_handler MyResumeFormat
+~~~
+
+**NOTE**: The theme expects `@data` to be a `Hash` with `String` keys.
+
+#### Creating a resume (HTML) programmatically:
+
+~~~rb
+resume = ResumeStylist::Resume.new(resume_source, :myformat)
+theme = ResumeStylist::Theme.new(theme_source)
+
+html = theme.render(resume.data)
+~~~
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/resume-stylist. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/omninonsense/resume-stylist. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
 
 ## License
 
