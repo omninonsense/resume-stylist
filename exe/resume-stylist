@@ -6,9 +6,21 @@ require "fileutils"
 require "optparse"
 
 options = {}
+def copyright
+  authors = Gem.loaded_specs["resume-stylist"].authors.join(",")
+  [
+    "The MIT License (MIT)",
+    "Copyright (c) 2016 #{authors}"
+  ].join "\n"
+end
+
+def version
+  "resume-stylist #{ResumeStylist::VERSION}"
+end
+
 
 build_parser = OptionParser.new do |opts|
-  opts.banner = "Usage: resume-stylist build [options]"
+  opts.banner = "Usage: resume-stylist build [options] [<input>] [<output>]"
 
   opts.separator ""
   opts.separator "Build options:"
@@ -41,7 +53,8 @@ default_parser = OptionParser.new do |opts|
   end
   # Another typical switch to print the version.
   opts.on_tail("-v", "--version", "Show version") do
-    puts "resume-stylist #{ResumeStylist::VERSION}"
+    puts copyright
+    puts version
     exit
   end
 
@@ -106,6 +119,13 @@ when "build"
 
 else
   default_parser.parse!
+
+  unless options[:new_theme] || options[:new_resume]
+    puts version
+    puts copyright
+    puts default_parser
+  end
+
   if options[:new_theme]
     FileUtils.cp("#{Gem.datadir("resume-stylist")}/templates/theme.html.liquid", File.expand_path(options[:new_theme]))
   end
