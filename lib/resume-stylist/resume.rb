@@ -1,64 +1,58 @@
-require "resume-stylist/resume/json.rb"
-require "resume-stylist/resume/xml.rb"
-
 module ResumeStylist
+  class UnsuportedFormatError < StandardError
+    # No body
+  end
+
   class Resume
-    attr_accessor :name, :label, :picture, :email, :phone, :website,
-    attr_accessor :address
-    attr_accessor :profiles
-    attr_accessor :experiences
+    Handlers = []
 
-    #@XXX: Remove summary, since it's kind of redundant on a CV?
-    attr_accessor :summary
-
-    class Address
-      attr_accessor :address, :postalCode, :city, :countryCode, :region
+    def self.register_handler(handler)
+      Handlers << handler
     end
 
-    class Profile
-      attr_accessor :network_name, :username, :url
-    end
+    attr_accessor :data
 
-    class Experience
-      attr_accessor :company, :position, :website, :summary, :highlights
-      attr_accessor :startDate, :endDate
-    end
+    def initialize(input, resume_format)
+      @data = {
+        "name" =>          "",
+        "label" =>         "",
+        "picture" =>       "",
+        "email" =>         "",
+        "phone" =>         "",
+        "website" =>       "",
+        "summary" =>       "",
 
-    class Experience
-      attr_accessor :organisation, :position, :website, :summary, :highlights
-      attr_accessor :startDate, :endDate
-      attr_accessor :volunteer
-    end
+        "location" => {
+          "address" => nil,
+          "postalCode" => nil,
+          "city" => nil,
+          "countryCode" => nil,
+          "region" => nil
+        },
 
-    class Education
-      attr_accessor :institution, :area, :studyType, :grade, :courses
-      attr_accessor :startDate, :endDate
-    end
+        "profiles" =>      [], # { network_name, username, url }
+        "work" =>          [], # { organisation, position, website, summary, highlights => [], startDate, endDate }
+        "volunteer" =>     [], # { organisation, position, website, summary, highlights => [], startDate, endDate }
+        "education" =>     [], # { institution, area, studyType, grade, courses => [], startDate, endDate }
+        "publications" =>  [], # { name, publisher, releaseDate, website, summary }
+        "skill" =>         [], # { name, level }
+        "language" =>      [], # { name, level }
+        "reference" =>     [], # { name, reference }
 
-    #@XXX: This seems like an odd thing to have IMHO, but whatevs.
-    class Award
-      attr_accessor :title, :date, :awarder, :summary
-    end
+        # @XXX: Remove these?
+        "awards" =>        [], # { title, date, awarder, summary }
+        "interests" =>     []  # { name, keywords }
+      }
 
-    class Publication
-      attr_accessor :name, :publisher, :releaseDate, :website, :summary
-    end
+      if handler = Handlers.find {|h| h.handles? resume_format }
+        handler.instance_method(:load!).bind(self).call(input)
+      else
+        raise UnsuportedFormatError, "`#{resume_format.to_s}` is not a valid format"
+      end
 
-    class Skill
-      attr_accessor :name, :level
-    end
-
-    class Language
-      attr_accessor :name, :level
-    end
-
-    class Interest
-      attr_accessor :name, :keywords
-
-    end
-
-    class Reference
-      attr_accessor :name, :reference
     end
   end
 end
+
+require "resume-stylist/resume/json.rb"
+require "resume-stylist/resume/xml.rb"
