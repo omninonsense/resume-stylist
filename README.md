@@ -2,7 +2,7 @@
 
 **Note**: Currently in very early development.
 
-Small framework for making CV/resume themes using [liquid](https://github.com/Shopify/liquid/wiki/liquid-for-designers) and [scss](http://sass-lang.com/).
+Small framework for making CV/resume themes using [Liquid](https://github.com/Shopify/liquid/wiki/liquid-for-designers) and [Sass](http://sass-lang.com/).
 
 ## Installation
 
@@ -12,6 +12,14 @@ $ gem install resume-stylist
 
 Also, since this uses PDFKit, you'll need to make sure you have `wkhtmltopdf` installed. On Arch it's as simple as running `sudo pacman -S wkhtmltopdf`, but consult their documentation for recommendations regarding other platforms: https://github.com/pdfkit/pdfkit#wkhtmltopdf
 
+## Features
+
+Here are some cool features:
+
+ - Uses Liquid as the templating language
+ - Support for inline Sass and SCSS by using `<style type="text/sass">` and `<style type="text/scss">`
+ - Support for multiple Resume formats (JSON and XML currently), but you can BYOF (Bring Your Own Format)!
+ - Export to PDF
 
 ## Usage
 
