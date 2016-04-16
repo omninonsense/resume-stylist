@@ -2,7 +2,6 @@ require "yajl"
 require "oga"
 require "liquid"
 require "sass"
-require "pdfkit"
 require "date"
 
 require "resume-stylist/version"

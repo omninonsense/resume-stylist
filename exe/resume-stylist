@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require "resume-stylist"
+require "pdfkit"
+require "fileutils"
 require "optparse"
 
 options = {}
@@ -104,4 +106,12 @@ when "build"
 
 else
   default_parser.parse!
+  if options[:new_theme]
+    FileUtils.cp("#{Gem.datadir("resume-stylist")}/templates/theme.html.liquid", File.expand_path(options[:new_theme]))
+  end
+
+  # @TODO: Add supporty for more formats
+  if options[:new_resume]
+    FileUtils.cp("#{Gem.datadir("resume-stylist")}/templates/resume.json", File.expand_path(options[:new_resume]))
+  end
 end
