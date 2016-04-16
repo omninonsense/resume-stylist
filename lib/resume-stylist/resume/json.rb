@@ -16,8 +16,7 @@ module ResumeStylist
     end
 
     def load!(input)
-      data = Yajl::Parser.parse(input, symbolize_keys: false)
-      # data = Yajl::Parser.parse(input, symbolize_keys: true)
+      data = Yajl::Parser.parse(input)
 
       # Copy the data data from the "basics" field into top level
       # and remove the basics group from the hash
