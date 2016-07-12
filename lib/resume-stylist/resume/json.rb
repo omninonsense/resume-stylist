@@ -18,23 +18,18 @@ module ResumeStylist
     def load!(input)
       data = Yajl::Parser.parse(input)
 
-      # Copy the data data from the "basics" field into top level
-      # and remove the basics group from the hash
-      data["basics"].each_pair {|k, v| data[k] = v }
-      data.delete "basics"
-
-      @data = data
-
       # Fix dates, since they're just strings now
-      [ @data["work"], @data["volunteer"], @data["education"] ].each do |set|
+      [ data["work"], data["volunteer"], data["education"] ].each do |set|
         set.each do |e|
           e["startDate"] = JSONResume.date_helper(e["startDate"])
           e["endDate"] = JSONResume.date_helper(e["endDate"])
         end
       end
 
-      @data["publications"].each{|e| e["releaseDate"] = JSONResume.date_helper(e["releaseDate"]) }
-      @data["awards"].each{|e| e["date"] = JSONResume.date_helper(e["date"]) }
+      data["publications"].each {|e| e["releaseDate"] = JSONResume.date_helper(e["releaseDate"]) }
+      data["awards"].each {|e| e["date"] = JSONResume.date_helper(e["date"]) }
+
+      @data = data
     end
   end
 end
