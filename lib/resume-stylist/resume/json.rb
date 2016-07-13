@@ -11,6 +11,22 @@ module ResumeStylist
       return date
     end
 
+    def self.downcase_keys_helper(h)
+      case h
+      when Hash
+        h = h.dup
+        h.keys.each do |key|
+          new_key = key.downcase
+          val = h.delete(key)
+          h[new_key] = downcase_keys_helper(val)
+        end
+      when Array
+        return h.map {|e| downcase_keys_helper(e) }
+      end
+
+      return h
+    end
+
     def self.handles?(resume_format)
       resume_format.to_s.downcase == "json"
     end
@@ -29,7 +45,7 @@ module ResumeStylist
       data["publications"].each {|e| e["releaseDate"] = JSONResume.date_helper(e["releaseDate"]) }
       data["awards"].each {|e| e["date"] = JSONResume.date_helper(e["date"]) }
 
-      @data = data
+      @data = JSONResume.downcase_keys_helper(data)
     end
   end
 end
