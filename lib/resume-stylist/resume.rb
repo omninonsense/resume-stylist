@@ -14,13 +14,15 @@ module ResumeStylist
 
     def initialize(input, resume_format)
       @data = {
-        "name" =>          "",
-        "label" =>         "",
-        "picture" =>       "",
-        "email" =>         "",
-        "phone" =>         "",
-        "website" =>       "",
-        "summary" =>       "",
+        "basics" => {
+          "name" =>          nil,
+          "label" =>         nil,
+          "picture" =>       nil,
+          "email" =>         nil,
+          "phone" =>         nil,
+          "website" =>       nil,
+          "summary" =>       nil
+        },
 
         "location" => {
           "address" => nil,
@@ -30,7 +32,7 @@ module ResumeStylist
           "region" => nil
         },
 
-        "profiles" =>      [], # { network_name, username, url }
+        "profiles" =>      [], # { network, username, url }
         "work" =>          [], # { organisation, position, website, summary, highlights => [], startDate, endDate }
         "volunteer" =>     [], # { organisation, position, website, summary, highlights => [], startDate, endDate }
         "education" =>     [], # { institution, area, studyType, grade, courses => [], startDate, endDate }
