@@ -53,7 +53,7 @@ class NormalizeCSS < Liquid::Tag
 
   NormalizeCSS_URI = URI("https://necolas.github.io/normalize.css/latest/normalize.css")
 
-  def initialize(tag_name, tokens, ctx)
+  def initialize(tag_name, tokens, liq)
     if tokens.include? "inline"
       req = Net::HTTP::Get.new(NormalizeCSS_URI.request_uri)
 
