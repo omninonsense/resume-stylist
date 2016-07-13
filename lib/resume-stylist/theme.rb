@@ -13,7 +13,16 @@ module ResumeStylist
     end
 
     def render(resume_data)
-      ctx = resume_data.merge({ "frontmatter" => @frontmatter })
+      meta_data = {
+        "frontmatter" => @frontmatter,
+
+        "_generator" => {
+          "name" =>  "resume-stylist",
+          "version" => ResumeStylist::VERSION
+        }
+
+      }
+      ctx = resume_data.merge(meta_data)
       @resume = @template.render(ctx)
       post_process!
 
