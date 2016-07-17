@@ -1,20 +1,522 @@
+---
+theme:
+  author:
+    name: Nino Miletich
+    url: https://github.com/omninonsense
+---
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>{{ name }}'s Resume</title>
-
+    <title>{{ basics.name }}'s Resume</title>
+    <meta name="description" content="{{ basics.summary }}">
+    <meta name="generator" content="{{ _generator.name }}/{{ _generator.version }}">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,800&subset=latin-ext" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Passion+One" rel="stylesheet">
     <!-- or type="text/sass" -->
     <style type="text/scss">
-      .resume {
-        h1 {
-          weight: bold;
+      {% normalize_css inline %}
+
+      $max_width: 1200px;
+      #resume {
+        font-family: 'Open Sans', sans-serif;
+        color: #222;
+        margin: 3ex 1em;
+        @media screen and (min-width: $max_width){
+          width: 900px;
+          margin: 3ex auto;
         }
       }
+
+      small {
+        display: block;
+      }
+
+      #basics {
+        .picture {
+          $size: 128px;
+          display: block;
+          width: $size;
+          height: $size;
+          border-radius: 50%;
+          margin: auto;
+          box-shadow: 0 0 0 5px #aaa;
+          border: 4px solid #fff;
+        }
+
+        h1 {
+          text-align: center;
+          font-weight: 300;
+
+          small {
+            color: #aaa;
+            font-weight: 100;
+          }
+        }
+
+        ul.contact {
+          text-align: center;
+          list-style-type: none;
+          padding: 0;
+          margin-top: 0;
+
+          li {
+            display: inline-block;
+            margin: 0 .5em;
+          }
+        }
+
+        ul.profiles {
+          list-style-type: none;
+          padding: 0;
+          text-align: center;
+
+          li {
+            display: inline-block;
+            margin: 0 1em;
+          }
+
+          .network-logo {
+            width: 22px;
+          }
+
+          a.profile {
+            text-decoration: none;
+          }
+
+          .network-logo {
+            vertical-align: middle;
+            margin-bottom: 3px;
+          }
+
+          .profile-facebook { color: #3C5A99; }
+          .profile-github   { color: #000000; }
+          .profile-twitter  { color: #66757f; }
+
+          .profile-username::before {
+            content: "@";
+            font-size: 125%;
+            position: relative;
+            bottom: -1px;
+          }
+
+        } /* .profiles */
+      } /* #basics */
+
+      /* WKHTML doesn't support flexbox properly */
+
+      .category {
+        /*display: flex;*/
+        display: table;
+        margin-top: 3ex;
+        page-break-before: auto;
+        page-break-inside: avoid;
+        page-break-after: auto;
+
+        & > div {
+          display: table-cell;
+        }
+
+        .title {
+          /*flex: 0 0 160px;*/
+          width: 160px;
+          text-align: right;
+          border-right: 1px solid #ccc;
+          padding: 1em;
+
+          h2 { font-weight: 100; }
+        }
+
+        ul.no-list {
+          padding: 0;
+          list-style-type: none;
+
+          & > li {
+            margin: 2em;
+          }
+
+          ul {
+            list-style-type: square;
+            li { margin-top: 0.75ex; }
+          }
+        }
+
+        .timespan { color: #999; }
+
+        .content {
+          h3 {
+            font-weight: 400;
+            margin-top: 0;
+            a { color: inherit; }
+            .company, .organisation { font-style: italic;  }
+          }
+        }
+      } /* .category */
+
+      #skills, #interests  {
+        h3 {
+          margin-bottom: 0;
+          margin-top: 1em;
+        }
+      }
+
+      #languages ul { margin: 2em; }
+
+      .courses, .keywords, .languages {
+        list-style-type: none;
+        padding: 0;
+
+        li {
+          margin: 0.75ex 0.25em;
+          display: inline-block;
+          background-color: #eee;
+          padding: .5ex .5em;
+          border-radius: 10%;
+        }
+      }
+
+
+      blockquote
+      {
+        border-left: 5px solid #ccc;
+        background-color: #eee;
+        margin: 0;
+        width: 100%;
+        padding: 1em;
+        position: relative;
+
+        p {
+          margin: 0;
+          margin-left: 1em;
+        }
+
+        cite {
+          display: block;
+          text-align: right;
+          &::before {
+            content: "— ";
+          }
+        }
+
+        &::before {
+          font-family: "Passion One", cursive;
+          display: block;
+          font-size: 500%;
+          color: #ccc;
+          height: 15px;
+          width: 60px;
+          float: left;
+          content: "“";
+          position: relative;
+          left: 20px;
+          top: -17px;
+        }
+      }
+
+      .flair {
+        color: #ccc;
+        text-align: right;
+
+        a {
+          color: #99b9d4;
+        }
+      }
+
     </style>
   </head>
-  <body class="resume">
-    <h1>{{ name }}'s Resume</h1>
-    <!-- todo -->
+  <body id="resume">
+    <section id="basics">
+      {% unless basics.picture == "" %}
+        <div class="group">
+          <img class="picture" src="{{ basics.picture }}" alt="Picture of {{ basics.name }}" />
+        </div>
+      {% endunless %}
+      <div class="group">
+        <h1>{{ basics.name }}<small>{{ basics.label }}</small></h1>
+        <ul class="contact">
+          <li><a href="mailto:{{ basics.email }}" class="contact-info email">{{ basics.email }}</a></li>
+          <li><span class="contact-info phone">{{ basics.phone }}</span></li>
+        </ul>
+        <ul class="profiles">
+          {% unless basics.profiles == empty %}
+            {% for profile in basics.profiles %}
+              <li>
+                <a class="profile profile-{{ profile.network | downcase }}" href="{{ profile.url }}">
+
+                  {% case profile.network %}
+                  {% when "Facebook" %}
+                    <!--  The below SVG was taken from Wikipedia. -->
+                    <svg version="1.1" id="Facebook" class="network-logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 266.893 266.895" viewBox="0 0 266.893 266.895" xml:space="preserve">
+                      <path id="Blue_1_" fill="#3C5A99" d="M248.082,262.307c7.854,0,14.223-6.369,14.223-14.225V18.812 c0-7.857-6.368-14.224-14.223-14.224H18.812c-7.857,0-14.224,6.367-14.224,14.224v229.27c0,7.855,6.366,14.225,14.224,14.225 H248.082z"/>
+                      <path id="f" fill="#FFFFFF" d="M182.409,262.307v-99.803h33.499l5.016-38.895h-38.515V98.777c0-11.261,3.127-18.935,19.275-18.935 l20.596-0.009V45.045c-3.562-0.474-15.788-1.533-30.012-1.533c-29.695,0-50.025,18.126-50.025,51.413v28.684h-33.585v38.895h33.585 v99.803H182.409z"/>
+                    </svg>
+                  {% when "GitHub" %}
+                    <!--  The below SVG was taken from Wikipedia. -->
+                    <svg version="1.1" id="GitHub" class="network-logo" viewbox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xml:space="preserve">
+                      <path d="M512 0C229.25 0 0 229.25 0 512c0 226.25 146.688 418.125 350.156 485.812 25.594 4.688 34.938-11.125 34.938-24.625 0-12.188-0.469-52.562-0.719-95.312C242 908.812 211.906 817.5 211.906 817.5c-23.312-59.125-56.844-74.875-56.844-74.875-46.531-31.75 3.53-31.125 3.53-31.125 51.406 3.562 78.47 52.75 78.47 52.75 45.688 78.25 119.875 55.625 149 42.5 4.654-33 17.904-55.625 32.5-68.375C304.906 725.438 185.344 681.5 185.344 485.312c0-55.938 19.969-101.562 52.656-137.406-5.219-13-22.844-65.094 5.062-135.562 0 0 42.938-13.75 140.812 52.5 40.812-11.406 84.594-17.031 128.125-17.219 43.5 0.188 87.312 5.875 128.188 17.281 97.688-66.312 140.688-52.5 140.688-52.5 28 70.531 10.375 122.562 5.125 135.5 32.812 35.844 52.625 81.469 52.625 137.406 0 196.688-119.75 240-233.812 252.688 18.438 15.875 34.75 47 34.75 94.75 0 68.438-0.688 123.625-0.688 140.5 0 13.625 9.312 29.562 35.25 24.562C877.438 930 1024 738.125 1024 512 1024 229.25 794.75 0 512 0z" />
+                    </svg>
+                  {% when "Twitter" %}
+                    <!--  The below SVG was taken from Wikipedia. -->
+                    <svg id="Twitter" class="network-logo" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewbox="0 0 182.26 148.12" version="1.1" xmlns:cc="http://creativecommons.org/ns#" viewBox="0 0 182.66667 150.66667" xmlns:dc="http://purl.org/dc/elements/1.1/"><metadata id="metadata8"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/></cc:Work></rdf:RDF></metadata><defs id="defs6"><clipPath id="clipPath20" clipPathUnits="userSpaceOnUse"><path id="path18" d="m0 10.012h1366.9v1110.9h-1366.9z"/></clipPath></defs><g id="g10" transform="matrix(1.3333 0 0 -1.3333 0 150.67)"><g id="g12" transform="scale(.1)"><g id="g14"><g id="g16" clip-path="url(#clipPath20)"><path id="path22" d="m1366.9 989.39c-50.27-22.309-104.33-37.387-161.05-44.18 57.89 34.723 102.34 89.679 123.28 155.15-54.18-32.15-114.18-55.47-178.09-68.04-51.13 54.49-124.02 88.55-204.68 88.55-154.89 0-280.43-125.55-280.43-280.43 0-21.988 2.457-43.398 7.258-63.91-233.08 11.68-439.72 123.36-578.04 293.01-24.141-41.4-37.969-89.567-37.969-140.97 0-97.308 49.489-183.13 124.76-233.44-45.969 1.437-89.218 14.058-127.03 35.078-0.043-1.18-0.043-2.348-0.043-3.52 0-135.9 96.68-249.22 224.96-275-23.512-6.41-48.281-9.8-73.86-9.8-18.089 0-35.628 1.711-52.781 5 35.711-111.41 139.26-192.5 262-194.77-96.058-75.23-216.96-120.04-348.36-120.04-22.621 0-44.961 1.332-66.918 3.91 124.16-79.568 271.55-125.98 429.94-125.98 515.82 0 797.86 427.31 797.86 797.93 0 12.153-0.28 24.223-0.79 36.25 54.77 39.571 102.31 88.95 139.93 145.2" fill="#55ACEE"/></g></g></g></g></svg>
+                  {% endcase %}
+
+                  <span class="profile-username">{{ profile.username }}</span>
+                </a>
+              </li>
+
+
+            {% endfor %}
+          {% endunless %}
+        </ul>
+        </div>
+    </section>
+
+    {% unless work == empty %}
+      <section id="work" class="category">
+        <div class="title">
+          <h2>Work Experience</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for experience in work %}
+              <li>
+                <div class="meta">
+                  <span class="timespan">
+                    <time datetime="{{experience.startdate}}">{{ experience.startdate | date: "%Y" }}</time>
+                    &ndash;
+                    {% if experience.enddate == nil %}
+                      current
+                    {% else %}
+                    <time datetime="{{ experience.enddate }}">{{ experience.enddate | date: "%Y" }}</time>
+                    {% endif %}
+                  </span>
+                  <h3>{{ experience.position }} at <span class="company">{% if experience.website == "" %}{{ experience.company }}{% else %}<a href="{{experience.website}}">{{ experience.company }}</a>{% endif %}</span></h3>
+                </div>
+                <p>{{ experience.summary }}</p>
+                {% unless experience.highlights == empty %}
+                  <ul class="highlights">
+                    {% for highlight in experience.highlights %}
+                      <li>{{ highlight }}</li>
+                    {% endfor %}
+                  </ul>
+                {%endunless%}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless volunteer == empty %}
+      <section id="volunteer" class="category">
+        <div class="title">
+          <h2>Volunteering</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for experience in volunteer %}
+              <li>
+                <div class="meta">
+                  <span class="timespan">
+                    <time datetime="{{experience.startdate}}">{{ experience.startdate | date: "%Y" }}</time>
+                    &ndash;
+                    {% if experience.enddate == nil %}
+                      current
+                    {% else %}
+                    <time datetime="{{ experience.enddate }}">{{ experience.enddate | date: "%Y" }}</time>
+                    {% endif %}
+                  </span>
+                  <h3>{{ experience.position }} at <span class="organisation">{% if experience.website == "" %}{{ experience.organization }}{% else %}<a href="{{experience.website}}">{{ experience.organization }}</a>{% endif %}</span></h3>
+                </div>
+                <p>{{ experience.summary }}</p>
+                {% unless experience.highlights == empty %}
+                  <ul class="highlights">
+                    {% for highlight in experience.highlights %}
+                      <li>{{ highlight }}</li>
+                    {% endfor %}
+                  </ul>
+                {%endunless%}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless education == empty %}
+      <section id="education" class="category">
+        <div class="title">
+          <h2>Education</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for edu in education %}
+              <li>
+                <span class="timespan">
+                  <time datetime="{{edu.startdate}}">{{ edu.startdate | date: "%Y" }}</time>
+                  &ndash;
+                  {% if edu.enddate == nil %}
+                    current
+                  {% else %}
+                  <time datetime="{{ edu.enddate }}">{{ edu.enddate | date: "%Y" }}</time>
+                  {% endif %}
+                </span>
+                <h3>{{ edu.area }}
+                    <small>
+                      {{ edu.institution }}
+                  </small>
+                </h3>
+                {% unless edu.gpa == empty %} <p><b>GPA: </b> {{ edu.gpa }}</p> {% endunless %}
+                {% unless edu.courses == empty %}
+                  <ul class="courses">
+                    {% for course in edu.courses %}
+                      <li>{{ course }}</li>
+                    {% endfor %}
+                  </ul>
+                {%endunless%}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless skills == empty %}
+      <section id="skills" class="category">
+        <div class="title">
+          <h2>Skills</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for skill in skills %}
+              <li>
+                <h3>{{ skill.name }}<small>{{ skill.level }}</small></h3>
+                {% unless skill.keywords == empty %}
+                  <ul class="keywords">
+                    {% for keyword in skill.keywords %}
+                      <li>{{ keyword }}</li>
+                    {% endfor %}
+                  </ul>
+                {%endunless%}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless awards == empty %}
+      <section id="awards" class="category">
+        <div class="title">
+          <h2>Awards</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for award in awards %}
+              <li>
+                <div class="meta">
+                  <span class="timespan"><time datetime="{{ award.date }}">{{ award.date | ordinal_date }}</time></span>
+                  <h3>{{ award.title }}<small>Awarded by <span class="awarder">{{ award.awarder }}</span></small></h3>
+                </div>
+                <p class="summary">{{ award.summary }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless publications == empty %}
+      <section id="publications" class="category">
+        <div class="title">
+          <h2>Publications</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for pub in publications %}
+              <li>
+                <div class="meta">
+                  <span class="timespan"><time datetime="{{ pub.releasedate }}">{{ pub.releasedate | ordinal_date }}</time></span>
+                  <h3>
+                    {% if pub.website == empty %}
+                      {{ pub.name }}
+                    {% else %}
+                      <a href="{{ pub.website }}">{{ pub.name }}</a>
+                    {% endif %}
+                    <small>Published by <span class="publisher">{{ pub.publisher }}</span></small>
+                  </h3>
+                </div>
+                <p class="summary">{{ pub.summary }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless interests == empty %}
+      <section id="interests" class="category">
+        <div class="title">
+          <h2>Interests</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for interest in interests %}
+              <li>
+                <h3>{{ interest.name }}</h3>
+                {% unless interest.keywords == empty %}
+                  <ul class="keywords">
+                    {% for keyword in interest.keywords %}
+                      <li>{{ keyword }}</li>
+                    {% endfor %}
+                  </ul>
+                {%endunless%}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless references == empty %}
+      <section id="references" class="category">
+        <div class="title">
+          <h2>References</h2>
+        </div>
+        <div class="content">
+          <ul class="no-list">
+            {% for reference in references %}
+              <li>
+                <blockquote>
+                  <div class="fancy-quote"></div>
+                  <p>{{ reference.reference }}</p>
+                  <cite>{{ reference.name }}</cite>
+                </blockquote>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    {% unless languages == empty %}
+      <section id="languages" class="category">
+        <div class="title">
+          <h2>Languages</h2>
+        </div>
+        <div class="content">
+          <ul class="languages">
+            {% for language in languages %}
+              <li>{{ language.name }}<small>{{ language.level }}</small></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endunless %}
+
+    <div class="flair">
+      CV generated using <a href="https://github.com/omninonsense/resume-stylist">{{ _generator.name }} v{{ _generator.version }}</a>, resume theme by <a href="{{ frontmatter.theme.author.url }}">{{ frontmatter.theme.author.name }}</a>.
+    </div>
+
   </body>
 </html>
