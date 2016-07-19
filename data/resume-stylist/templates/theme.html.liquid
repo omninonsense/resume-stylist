@@ -36,12 +36,12 @@ theme:
 
       #basics {
 
-        .picture-border {
+        .picture-container {
           $size: 128px;
           border-radius: 50%;
           width: $size;
           height: $size;
-          border: 4px solid #aaa;
+          border: 4px solid #ccc;
           margin: auto;
           display: block;
         }
@@ -50,6 +50,7 @@ theme:
           border: 4px solid #fff;
           border-radius: 50%;
           width: 100%;
+          height: 100%;
           box-sizing: border-box;
         }
 
@@ -58,7 +59,7 @@ theme:
           font-weight: 300;
 
           small {
-            color: #aaa;
+            color: #999;
             font-weight: 100;
           }
         }
@@ -248,7 +249,7 @@ theme:
     <section id="basics">
       {% unless basics.picture == "" %}
         <div class="group">
-          <div class="picture-border">
+          <div class="picture-container">
             <img class="picture" src="{{ basics.picture }}" alt="Picture of {{ basics.name }}" />
           </div>
         </div>
